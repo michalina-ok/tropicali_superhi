@@ -1,18 +1,22 @@
 var gulp = require('gulp')
-var sass = require('gulp-sass')
 var cleanCss = require('gulp-clean-css')
+var postcss = require('gulp-postcss')
 var sourcemaps = require('gulp-sourcemaps')
 var browserSync = require('browser-sync').create()
 
 var imagemin = require('gulp-imagemin')
 var ghpages = require ('gh-pages')
 
-sass.complier = require('node-sass')
 
-gulp.task('sass', function() {
-    return gulp.src('src/css/app.scss')
+
+gulp.task('css', function() {
+    return gulp.src('src/css/app.css')
     .pipe(sourcemaps.init())
-    .pipe(sass())
+    .pipe(
+        postcss([
+            require('autoprefixer'),
+            require('postcss-preset-env')
+        ]))
     .pipe(
         cleanCss({
             compatibility: 'ie8'
@@ -48,7 +52,7 @@ browserSync.init({
 })
 
     gulp.watch('src/*.html', ['html']).on('change', browserSync.reload)
-    gulp.watch('src/css/app.scss', ['sass'])
+    gulp.watch('src/css/app.css', ['css'])
     gulp.watch('src/fonts/*', ['fonts'])
     gulp.watch('src/img/*', ['images'])
 })
@@ -56,5 +60,5 @@ gulp.task('deploy', function(){
     ghpages.publish('dist')
 })
 
-gulp.task('default', ['html', 'sass', 'fonts', 'images', 'watch']);
+gulp.task('default', ['html', 'css', 'fonts', 'images', 'watch']);
 
